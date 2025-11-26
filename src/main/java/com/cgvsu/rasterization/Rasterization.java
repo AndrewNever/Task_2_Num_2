@@ -42,25 +42,25 @@ public class Rasterization {
             final double x1, final double y1, final Color c1,
             final double x2, final double y2, final Color c2)
     {
-        // Вычисляем ограничивающий прямоугольник
+
         int minX = (int) Math.floor(Math.min(x0, Math.min(x1, x2)));
         int maxX = (int) Math.ceil(Math.max(x0, Math.max(x1, x2)));
         int minY = (int) Math.floor(Math.min(y0, Math.min(y1, y2)));
         int maxY = (int) Math.ceil(Math.max(y0, Math.max(y1, y2)));
 
-        // Клиппинг в границы поверхности
+
         minX = Math.max(minX, 0);
         minY = Math.max(minY, 0);
         maxX = Math.min(maxX, surfaceWidth - 1);
         maxY = Math.min(maxY, surfaceHeight - 1);
 
-        // Площадь через ориентированный псевдовекторный векторный множитель
+
         final double area = edgeFunction(x0, y0, x1, y1, x2, y2);
         if (Math.abs(area) < 1e-8) {
-            return; // Вырожденный треугольник
+            return;
         }
 
-        // Проход по пикселям; семплим в центре (x + 0.5, y + 0.5)
+
         for (int y = minY; y <= maxY; y++) {
             final double sampleY = y + 0.5;
             for (int x = minX; x <= maxX; x++) {
@@ -74,7 +74,7 @@ public class Rasterization {
                 w1 /= area;
                 w2 /= area;
 
-                // Проверка попадания внутрь с небольшим допуском
+
                 if (w0 >= -1e-8 && w1 >= -1e-8 && w2 >= -1e-8) {
                     final double r = clamp01(c0.getRed() * w0 + c1.getRed() * w1 + c2.getRed() * w2);
                     final double g = clamp01(c0.getGreen() * w0 + c1.getGreen() * w1 + c2.getGreen() * w2);
@@ -86,7 +86,7 @@ public class Rasterization {
         }
     }
 
-    // Новый метод: рисование отрезка алгоритмом Брезенхэма (без интерполяции цвета)
+
     public static void drawLineBresenham(
             final GraphicsContext graphicsContext,
             final int x0, final int y0,
@@ -97,7 +97,7 @@ public class Rasterization {
         drawLineBresenham(pixelWriter, x0, y0, x1, y1, color);
     }
 
-    // Основная реализация алгоритма Брезенхэма
+
     public static void drawLineBresenham(
             final PixelWriter pixelWriter,
             final int x0, final int y0,
@@ -107,7 +107,7 @@ public class Rasterization {
         int dx = Math.abs(x1 - x0);
         int dy = Math.abs(y1 - y0);
 
-        // Определяем направление рисования
+
         int sx = (x0 < x1) ? 1 : -1;
         int sy = (y0 < y1) ? 1 : -1;
 
@@ -116,10 +116,10 @@ public class Rasterization {
         int currentY = y0;
 
         while (true) {
-            // Рисуем текущий пиксель
+
             pixelWriter.setColor(currentX, currentY, color);
 
-            // Если достигли конечной точки, выходим
+
             if (currentX == x1 && currentY == y1) {
                 break;
             }
