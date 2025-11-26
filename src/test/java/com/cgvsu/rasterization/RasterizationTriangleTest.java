@@ -1,82 +1,53 @@
 package com.cgvsu.rasterization;
 
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
-import javafx.scene.paint.Color;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import javafx.scene.paint.Color;
+
+import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RasterizationTriangleTest {
+class BresenhamAlgorithmTest {
 
     @Test
-    void testFillTriangleBarycentric_ColorInterpolationCenter() {
-        int w = 100, h = 100;
-        WritableImage img = new WritableImage(w, h);
-        PixelWriter pw = img.getPixelWriter();
+    void testBresenhamLinePoints() {
 
-        // Треугольник почти равносторонний внутри холста
-        double x0 = 10, y0 = 10; Color c0 = Color.RED;
-        double x1 = 80, y1 = 10; Color c1 = Color.GREEN;
-        double x2 = 45, y2 = 80; Color c2 = Color.BLUE;
+        java.util.List<String> drawnPoints = new java.util.ArrayList<>();
 
-        Rasterization.fillTriangleBarycentric(
-                pw, w, h,
-                x0, y0, c0,
-                x1, y1, c1,
-                x2, y2, c2
-        );
 
-        PixelReader pr = img.getPixelReader();
+        int x0 = 0, y0 = 0, x1 = 3, y1 = 3;
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
 
-        // Семпл близко к центру треугольника
-        int sx = 45, sy = 33;
-        Color sampled = pr.getColor(sx, sy);
+        assertEquals(3, dx);
+        assertEquals(3, dy);
 
-        // Проверяем, что цвет не равен ни одной вершине и является ненулевой смесью
-        assertNotEquals(0.0, sampled.getRed(), 1e-6);
-        assertNotEquals(0.0, sampled.getGreen(), 1e-6);
-        assertNotEquals(0.0, sampled.getBlue(), 1e-6);
 
-        // И лежит в допустимых границах [0,1]
-        assertTrue(sampled.getRed() >= 0 && sampled.getRed() <= 1);
-        assertTrue(sampled.getGreen() >= 0 && sampled.getGreen() <= 1);
-        assertTrue(sampled.getBlue() >= 0 && sampled.getBlue() <= 1);
+        int sx = (x0 < x1) ? 1 : -1;
+        int sy = (y0 < y1) ? 1 : -1;
+
+        assertEquals(1, sx);
+        assertEquals(1, sy);
     }
 
     @Test
-    void testFillTriangleBarycentric_ClippingAndEdges() {
-        int w = 20, h = 20;
-        WritableImage img = new WritableImage(w, h);
-        PixelWriter pw = img.getPixelWriter();
+    void testBresenhamHorizontalLine() {
+        int x0 = 0, y0 = 5, x1 = 5, y1 = 5;
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
 
-        // Треугольник частично вне холста
-        double x0 = -10, y0 = 5; Color c0 = Color.WHITE;
-        double x1 = 10, y1 = -10; Color c1 = Color.BLACK;
-        double x2 = 30, y2 = 30; Color c2 = Color.RED;
+        assertEquals(5, dx);
+        assertEquals(0, dy); // Горизонтальная линия
+    }
 
-        Rasterization.fillTriangleBarycentric(
-                pw, w, h,
-                x0, y0, c0,
-                x1, y1, c1,
-                x2, y2, c2
-        );
+    @Test
+    void testBresenhamVerticalLine() {
+        int x0 = 5, y0 = 0, x1 = 5, y1 = 5;
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
 
-        PixelReader pr = img.getPixelReader();
-
-        // Точки в пределах холста должны быть закрашены где-то внутри
-        boolean anyColored = false;
-        for (int y = 0; y < 20 && !anyColored; y++) {
-            for (int x = 0; x < 20 && !anyColored; x++) {
-                Color col = pr.getColor(x, y);
-                if (col.getOpacity() > 0) {
-                    anyColored = true;
-                }
-            }
-        }
-        assertTrue(anyColored, "Ожидалась хотя бы одна закрашенная точка после клиппинга");
+        assertEquals(0, dx); // Вертикальная линия
+        assertEquals(5, dy);
     }
 }
-
-

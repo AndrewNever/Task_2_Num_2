@@ -13,6 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.8.2</junit.version>
         <javafx.version>21.0.4</javafx.version>
+        <testfx.version>4.0.16-alpha</testfx.version>
     </properties>
 
     <dependencies>
@@ -37,6 +38,14 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- TestFX для тестирования JavaFX -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-junit5</artifactId>
+            <version>${testfx.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -66,11 +75,9 @@
                 <version>0.0.8</version>
                 <executions>
                     <execution>
-                        <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.cgvsu.rasterizationfxapp/com.cgvsu.rasterizationfxapp.RasterizationApplication
-                            </mainClass>
+                            <mainClass>com.cgvsu.rasterizationfxapp/com.cgvsu.rasterizationfxapp.RasterizationApplication</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
